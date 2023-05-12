@@ -9,6 +9,9 @@ on:
       webjob-cron:
         description: 'Webjob run time in CRON format'
         required: true
+      output-path:
+        description: 'Extracted zip path'
+        required: true
 
 jobs:
   download_artifacts:
@@ -25,7 +28,7 @@ jobs:
           target: ${{ secrets.BUILD_OUTPUT_PATH }}
 
       - name: Extract build output
-        run: unzip ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.url }} -d ${{ secrets.BUILD_OUTPUT_PATH }}
+        run: unzip ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }} -d ${{ secrets.BUILD_OUTPUT_PATH }}
 
       - name: Set up Azure CLI
         uses: azure/login@v1
@@ -38,7 +41,7 @@ jobs:
                 --resource-group gr-eshtab-dev \
                 --name app-dataverse-to-sql-webjobs-test \
                 --job-name test \
-                --src-path ${{ github.event.inputs.url }}
+                --src-path ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }}
 
       - name: Update WebJob Schedule
         run: |
