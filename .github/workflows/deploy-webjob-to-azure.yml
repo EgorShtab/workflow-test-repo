@@ -1,0 +1,49 @@
+name: Deploy Console To Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Url of data mover artifact'
+        required: true
+      webjob-cron:
+        description: 'Webjob run time in CRON format'
+        required: true
+
+jobs:
+  download_artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Download artifact
+        uses: suisei-cn/actions-download-file@v1.3.0
+        id: artifact
+        with:
+          url: ${{ github.event.inputs.url }}
+          target: ${{ secrets.BUILD_OUTPUT_PATH }}
+
+      - name: Extract build output
+        run: unzip ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.url }} -d ${{ secrets.BUILD_OUTPUT_PATH }}
+
+      - name: Set up Azure CLI
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy WebJob
+        run: |
+            az webapp webjob continuous deployment upload \
+                --resource-group gr-eshtab-dev \
+                --name app-dataverse-to-sql-webjobs-test \
+                --job-name test \
+                --src-path ${{ github.event.inputs.url }}
+
+      - name: Update WebJob Schedule
+        run: |
+            az webapp webjob continuous update \
+                --resource-group gr-eshtab-dev \
+                --name app-dataverse-to-sql-webjobs-test \
+                --job-name test \
+                --cron ${{ github.event.inputs.webjob-cron }}
