@@ -37,7 +37,7 @@ jobs:
 
       - name: Deploy WebJob
         run: |
-            az webapp webjob continuous deployment upload \
+            az webapp webjob continuous upload \
                 --resource-group gr-eshtab-dev \
                 --name app-dataverse-to-sql-webjobs-test \
                 --job-name test \
