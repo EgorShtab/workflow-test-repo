@@ -41,7 +41,6 @@ jobs:
             az webapp deployment source config-zip\
                 --resource-group gr-eshtab-dev \
                 --name app-dataverse-to-sql-webjobs-test \
-                --job-name test \
                 --src ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }}
 
       - name: Update WebJob Schedule
