@@ -27,9 +27,6 @@ jobs:
           url: ${{ github.event.inputs.url }}
           target: ${{ secrets.BUILD_OUTPUT_PATH }}
 
-      - name: Extract build output
-        run: unzip ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }} -d ${{ secrets.BUILD_OUTPUT_PATH }}
-
       - name: Set up Azure CLI
         uses: azure/login@v1
         with:
