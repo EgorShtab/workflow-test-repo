@@ -42,7 +42,7 @@ jobs:
                 --resource-group gr-eshtab-dev \
                 --name app-dataverse-to-sql-webjobs-test \
                 --job-name test \
-                --src-path ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }}
+                --src ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }}
 
       - name: Update WebJob Schedule
         run: |
