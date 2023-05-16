@@ -38,11 +38,11 @@ jobs:
 
       - name: Deploy WebJob
         run: |
-            az webapp deployment source config-zip\
+            az webapp deployment source config \
                 --resource-group gr-eshtab-dev \
                 --name app-dataverse-to-sql-webjobs-test \
                 --src ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }}
-                --type runFromZip \
+                --type zip \
 
       - name: Update WebJob Schedule
         run: |
