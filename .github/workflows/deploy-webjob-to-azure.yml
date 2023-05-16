@@ -32,6 +32,10 @@ jobs:
         with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Ls
+        run: |
+          ls ${{ secrets.BUILD_OUTPUT_PATH }}
+
       - name: Deploy WebJob
         run: |
             az webapp deployment source config-zip\
