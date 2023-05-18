@@ -25,18 +25,26 @@ jobs:
         with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Download artifact
+        uses: suisei-cn/actions-download-file@v1.3.0
+        id: artifact
+        with:
+          url: ${{ github.event.inputs.url }}
+          target: ${{ secrets.BUILD_OUTPUT_PATH }}
+
       - name: Deploy WebJob
         run: |
-            az webapp deployment source config \
-                --resource-group gr-eshtab-dev \
-                --name app-dataverse-to-sql-webjobs-test \
-                --repo-url ${{ github.event.inputs.url }}
-                --type zip \
+          az webapp deploy
+            --name app-dataverse-to-sql-webjobs-test \
+            --resource-group gr-eshtab-dev \
+            --src-path ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }} \
+            --type static \
+            --target-path /home/site/Jobs/continuous/
 
       - name: Update WebJob Schedule
         run: |
-            az webapp webjob continuous update \
-                --resource-group gr-eshtab-dev \
-                --name app-dataverse-to-sql-webjobs-test \
-                --job-name test \
-                --cron ${{ github.event.inputs.webjob-cron }}
+          az webapp webjob continuous update \
+            --resource-group gr-eshtab-dev \
+            --name app-dataverse-to-sql-webjobs-test \
+            --job-name test \
+            --cron ${{ github.event.inputs.webjob-cron }}
