@@ -61,9 +61,9 @@ jobs:
 
       - name: Deploy WebJob
         run: |
-          az webapp deploy \
+          az webapp deploy config-zip \
             --name app-dataverse-to-sql-webjobs-test \
             --resource-group gr-eshtab-dev \
-            --src-path ${{ secrets.BUILD_OUTPUT_PATH }}/build/ \
+            --src-path ${{ secrets.BUILD_OUTPUT_PATH }}/build/${{ github.event.inputs.output-path }} \
             --type static \
             --target-path /home/site/wwwroot/App_Data/jobs/triggered/test2/${{ github.event.inputs.output-path }}
