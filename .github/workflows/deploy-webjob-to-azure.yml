@@ -51,6 +51,7 @@ jobs:
             filePath="run.bash"
           fi
           touch "$filePath"
+          echo '${{secrets.ENVIRONMENT_VARIABLES}}' > "$filePath"
           echo 'dotnet ${{secrets.EXECUTABLE_CONSOLE_DLL}}' > "$filePath"
           touch settings.job
           echo '{"schedule":"${{github.event.inputs.webjob-cron}}"}' > settings.job
