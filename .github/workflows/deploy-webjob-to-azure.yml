@@ -42,7 +42,7 @@ jobs:
       - name: Extract build output and add necessary files
         run: |
           unzip ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }} -d ${{ secrets.BUILD_OUTPUT_PATH }}/build
-          cd ${{ secrets.BUILD_OUTPUT_PATH }}/build
+          cd ${{ secrets.BUILD_OUTPUT_PATH }}/build/App_Data/jobs/triggered/test
           filePath=""
           if [ "${{github.event.inputs.resource-os}}" = "Windows" ]; then
             filePath="run.bat"
