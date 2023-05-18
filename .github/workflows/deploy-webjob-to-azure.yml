@@ -4,21 +4,21 @@ on:
   workflow_dispatch:
     inputs:
       url:
-        description: 'Url of data mover artifact'
+        description: "Url of data mover artifact"
         required: true
       webjob-cron:
-        description: 'Webjob run time in CRON format'
+        description: "Webjob run time in CRON format"
         required: true
       output-path:
-        description: 'Extracted zip path'
+        description: "Extracted zip path"
         required: true
       resource-os:
         required: true
         type: choice
         description: Choose web resource OS
         options:
-        - Linux
-        - Windows
+          - Linux
+          - Windows
 
 jobs:
   download_artifacts:
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Azure CLI
         uses: azure/login@v1
         with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Download artifact
         uses: suisei-cn/actions-download-file@v1.3.0
@@ -65,5 +65,3 @@ jobs:
             --name app-dataverse-to-sql-webjobs-test \
             --resource-group gr-eshtab-dev \
             --src ${{ secrets.BUILD_OUTPUT_PATH }}/build/${{ github.event.inputs.output-path }} \
-            --type static \
-            --target-path /home/site/wwwroot/App_Data/jobs/triggered/test2/${{ github.event.inputs.output-path }}
