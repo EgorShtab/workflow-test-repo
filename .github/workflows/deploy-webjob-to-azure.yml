@@ -34,7 +34,7 @@ jobs:
 
       - name: Deploy WebJob
         run: |
-          az webapp deploy
+          az webapp deploy \
             --name app-dataverse-to-sql-webjobs-test \
             --resource-group gr-eshtab-dev \
             --src-path ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }} \
