@@ -39,7 +39,7 @@ jobs:
             --resource-group gr-eshtab-dev \
             --src-path ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }} \
             --type static \
-            --target-path /home/site/Jobs/Triggered/JobTest/${{ github.event.inputs.output-path }}
+            --target-path /home/site/Jobs/Triggered/${{ github.event.inputs.output-path }}
 
       - name: Update WebJob Schedule
         run: |
