@@ -12,6 +12,13 @@ on:
       output-path:
         description: 'Extracted zip path'
         required: true
+      resource-os:
+        required: true
+        type: choice
+        description: Choose web resource OS
+        options:
+        - Linux
+        - Windows
 
 jobs:
   download_artifacts:
@@ -32,19 +39,31 @@ jobs:
           url: ${{ github.event.inputs.url }}
           target: ${{ secrets.BUILD_OUTPUT_PATH }}
 
+      - name: Extract build output and add necessary files
+        run: |
+          unzip ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }} -d ${{ secrets.BUILD_OUTPUT_PATH }}/build
+          cd ${{ secrets.BUILD_OUTPUT_PATH }}/build
+          filePath=""
+          if [ "${{github.event.inputs.resource-os}}" = "Windows" ]; then
+            filePath="run.bat"
+          else
+            filePath="run.bash"
+          fi
+          touch "$filePath"
+          echo 'dotnet ${{secrets.EXECUTABLE_CONSOLE_DLL}}' > "$filePath"
+          touch settings.job
+          echo '{"schedule":"${{github.event.inputs.webjob-cron}}"}' > settings.job
+
+      - name: Zip console app
+        run: |
+          cd ${{ secrets.BUILD_OUTPUT_PATH }}/build
+          zip ${{github.event.inputs.output-path}} -r ./
+
       - name: Deploy WebJob
         run: |
           az webapp deploy \
             --name app-dataverse-to-sql-webjobs-test \
             --resource-group gr-eshtab-dev \
-            --src-path ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }} \
+            --src-path ${{ secrets.BUILD_OUTPUT_PATH }}/build/${{ github.event.inputs.output-path }} \
             --type static \
-            --target-path /home/site/Jobs/Triggered/${{ github.event.inputs.output-path }}
-
-      - name: Update WebJob Schedule
-        run: |
-          az webapp webjob continuous update \
-            --resource-group gr-eshtab-dev \
-            --name app-dataverse-to-sql-webjobs-test \
-            --job-name test \
-            --cron ${{ github.event.inputs.webjob-cron }}
+            --target-path /home/site/wwwroot/App_Data/jobs/triggered/test2/${{ github.event.inputs.output-path }}
