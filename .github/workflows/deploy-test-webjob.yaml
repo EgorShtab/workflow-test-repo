@@ -1,4 +1,4 @@
-name: Deploy Console To Test
+name: Deploy TEST CONSOLE To Test
 
 on:
   workflow_dispatch:
