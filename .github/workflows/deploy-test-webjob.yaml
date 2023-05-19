@@ -29,6 +29,7 @@ jobs:
       - name: Extract build output and add necessary files
         run: |
           mkdir -p ./build/App_Data/jobs/triggered/test
+          dotnet build --output ./build/App_Data/jobs/triggered/test
           cd ./build/App_Data/jobs/triggered/test
           filePath=""
           if [ "${{github.event.inputs.resource-os}}" = "Windows" ]; then
