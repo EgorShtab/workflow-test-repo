@@ -1,0 +1,55 @@
+name: Deploy Console To Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      webjob-cron:
+        description: "Webjob run time in CRON format"
+        required: true
+      resource-os:
+        required: true
+        type: choice
+        description: Choose web resource OS
+        options:
+          - Linux
+          - Windows
+
+jobs:
+  download_artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Extract build output and add necessary files
+        run: |
+          mkdir -p ./build/App_Data/jobs/triggered/test
+          cd ./build/App_Data/jobs/triggered/test
+          filePath=""
+          if [ "${{github.event.inputs.resource-os}}" = "Windows" ]; then
+            filePath="run.bat"
+          else
+            filePath="run.bash"
+          fi
+          touch "$filePath"
+          echo '${{secrets.ENVIRONMENT_VARIABLES}}' > "$filePath"
+          echo 'dotnet ${{secrets.EXECUTABLE_CONSOLE_DLL}}' > "$filePath"
+          touch settings.job
+          echo '{"schedule":"${{github.event.inputs.webjob-cron}}"}' > settings.job
+
+      - name: Zip console app
+        run: |
+          cd ./build
+          zip test-webjob -r ./
+
+      - name: Deploy WebJob
+        run: |
+          az webapp deployment source config-zip \
+            --name app-dataverse-to-sql-webjobs-test \
+            --resource-group gr-eshtab-dev \
+            --src ./build/test-webjob.zip \
