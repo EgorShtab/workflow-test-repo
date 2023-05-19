@@ -3,14 +3,8 @@ name: Deploy Console To Test
 on:
   workflow_dispatch:
     inputs:
-      url:
-        description: "Url of data mover artifact"
-        required: true
       webjob-cron:
         description: "Webjob run time in CRON format"
-        required: true
-      output-path:
-        description: "Extracted zip path"
         required: true
       resource-os:
         required: true
@@ -32,18 +26,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Download artifact
-        uses: suisei-cn/actions-download-file@v1.3.0
-        id: artifact
-        with:
-          url: ${{ github.event.inputs.url }}
-          target: ${{ secrets.BUILD_OUTPUT_PATH }}
-
       - name: Extract build output and add necessary files
         run: |
-          mkdir -p ${{ secrets.BUILD_OUTPUT_PATH }}/build/App_Data/jobs/triggered/test
-          unzip ${{ secrets.BUILD_OUTPUT_PATH }}/${{ github.event.inputs.output-path }} -d ${{ secrets.BUILD_OUTPUT_PATH }}/build/App_Data/jobs/triggered/test
-          cd ${{ secrets.BUILD_OUTPUT_PATH }}/build/App_Data/jobs/triggered/test
+          mkdir -p ./build/App_Data/jobs/triggered/test
+          cd ./build/App_Data/jobs/triggered/test
           filePath=""
           if [ "${{github.event.inputs.resource-os}}" = "Windows" ]; then
             filePath="run.bat"
@@ -58,12 +44,12 @@ jobs:
 
       - name: Zip console app
         run: |
-          cd ${{ secrets.BUILD_OUTPUT_PATH }}/build
-          zip ${{github.event.inputs.output-path}} -r ./
+          cd ./build
+          zip test-webjob -r ./
 
       - name: Deploy WebJob
         run: |
           az webapp deployment source config-zip \
             --name app-dataverse-to-sql-webjobs-test \
             --resource-group gr-eshtab-dev \
-            --src ${{ secrets.BUILD_OUTPUT_PATH }}/build/${{ github.event.inputs.output-path }} \
+            --src ./build/test-webjob.zip \
